@@ -259,44 +259,54 @@ public class Level {
 	}
 
 	private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<Gas> placedThisRound) {
-
 		if (numSquaresToFill <= 0)
 			return;
 
-		Gas newGas = new Gas(col, row, tileSize, tileset.getImage("GasOne"), this, 1);
-		map.addTile(col, row, newGas);
-		placedThisRound.add(newGas);
+		int[][] directions = {
+				{ -1, 0 }, // up
+				{ -1, 1 }, // up right
+				{ -1, -1 }, // up left
+				{ 0, 1 }, // right
+				{ 0, -1 }, // left
+				{ 1, 0 }, // down
+				{ 1, 1 }, // down right
+				{ 1, -1 } // down left
+		};
+
+		Gas center = new Gas(col, row, tileSize, tileset.getImage("GasOne"), this, 1);
+		map.addTile(col, row, center);
+		placedThisRound.add(center);
 		numSquaresToFill--;
 
-		
-		int[][] directions = {
-				{ 0, -1 }, // up
-				{ 1, -1 }, // up right
-				{ -1, -1 }, // up left
-				{ 1, 0 }, // center right
-				{ -1, 0 }, // center left
-				{ 0, 1 }, // down
-				{ 1, 1 }, // down right
-				{ -1, 1 } // down left
-		};
-		
-		for (int i = 0; i < directions.length; i++) {
-			for (int j = 1; j <= directions[i].length; j++) {
-				int newRow = directions[i][1];
-				int newCol = directions[j][0];
-				
-				if (newCol >= 0 && newCol < map.getTiles().length && row >= 0 && row < map.getTiles()[0].length 
-				&& !map.getTiles()[newCol][newRow].isSolid() && alreadyPlaced(newCol, newRow, placedThisRound)){
-			
-					newGas = new Gas(newCol, newRow, tileSize, tileset.getImage("GasOne"), this, 1);
-			map.addTile(newCol, newRow, newGas);
-			placedThisRound.add(newGas);
-			numSquaresToFill--;
+		int index = 0;
+
+		while (index < placedThisRound.size() && numSquaresToFill > 0) {
+			Gas current = placedThisRound.get(index);
+			int currentCol = current.getCol();
+			int currentRow = current.getRow();
+
+			for (int i = 0; i < directions.length; i++) { // rows
+
+				int newRow = currentRow + directions[i][0];
+				int newCol = currentCol + directions[i][1];
+
+				if (newCol >= 0 && newCol < map.getTiles().length && newRow >= 0 && newRow < map.getTiles()[0].length
+						&& !map.getTiles()[newCol][newRow].isSolid()
+						&& !alreadyPlaced(newCol, newRow, placedThisRound)) {
+
+					Gas newGas2 = new Gas(newCol, newRow, tileSize, tileset.getImage("GasOne"), this, 1);
+					map.addTile(newCol, newRow, newGas2);
+					placedThisRound.add(newGas2);
+					numSquaresToFill--;
+					if (numSquaresToFill <= 0)
+						break;
 				}
+
 			}
+
+			index++;
 		}
-	
-}
+	}
 
 	// Helper to check if a gas tile was placed at (col,row) this round
 	private boolean alreadyPlaced(int col, int row, ArrayList<Gas> placedThisRound) {
