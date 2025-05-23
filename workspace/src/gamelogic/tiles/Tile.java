@@ -16,6 +16,12 @@ public class Tile{
 	protected BufferedImage image;
 	protected boolean solid;
 	protected Level level;
+
+	public void setImage(java.awt.image.BufferedImage image) {
+    this.image = image;
+}
+
+
 	
 	public Tile(float x, float y, int size, BufferedImage image, boolean solid, Level level) {
 		this.position = new Vector2D(x*size, y*size);
